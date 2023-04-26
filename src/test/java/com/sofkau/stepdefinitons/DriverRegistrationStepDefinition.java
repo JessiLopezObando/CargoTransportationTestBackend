@@ -6,18 +6,18 @@ import com.sofkau.setup.ApiSetUp;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.junit.jupiter.api.Assertions;
 
-import static com.sofkau.questions.ReturnPostResponse.returnPostResponse;
 import static com.sofkau.tasks.DoPost.doPost;
 import static com.sofkau.utils.CargoTransportationConstants.POST_DRIVER;
 import static com.sofkau.utils.CargoTransportationConstants.URL_BASE;
 import static net.serenitybdd.rest.SerenityRest.lastResponse;
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.rest.questions.ResponseConsequence.seeThatResponse;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class DriverRegistrationStepDefinition extends ApiSetUp {
@@ -39,6 +39,7 @@ public class DriverRegistrationStepDefinition extends ApiSetUp {
                     seeThatResponse("The server is not available.",
                             response -> response.statusCode(HttpStatus.SC_OK))
             );
+            Assertions.fail();
         }
     }
 
@@ -89,24 +90,30 @@ public class DriverRegistrationStepDefinition extends ApiSetUp {
         } catch (Exception e) {
             LOGGER.error("An error occurred while sending the POST request: " + e.getMessage());
             e.printStackTrace();
+            Assertions.fail();
         }
     }
 
-    @Then("the response status code should be {int}")
-    public void theResponseStatusCodeShouldBe(Integer code) {
+    @Then("the response status code should be {int} and return a {string}")
+    public void theResponseStatusCodeShouldBeAndReturnA(Integer code, String message){
 
-        actor.should(
-                seeThatResponse("El codigo de respuesta es: " + code,
-                        response -> {
-                            if (response.extract().statusCode() == 400) {
-                                LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
-                            } else {
-                                response.statusCode(code);
-                                LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
-                            }
-                        }
-                )
-        );
+       try {
+           actor.should(
+                   seeThatResponse("The satatus code is: " + code,
+                           response -> {
+                               response.statusCode(code);
+                               LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
+                           }
+                   ),
+                   seeThat("The returned message is: ", act -> lastResponse().body().asString(),
+                           containsString(message))
+           );
+       } catch (Exception e){
+           LOGGER.error("An error occurred with the assertion: " + e.getMessage());
+           LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
+           e.printStackTrace();
+           Assertions.fail();
+       }
 
 
     }
