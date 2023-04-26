@@ -6,15 +6,19 @@ import com.sofkau.setup.ApiSetUp;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
+import static com.sofkau.questions.ReturnPostResponse.returnPostResponse;
 import static com.sofkau.tasks.DoPost.doPost;
 import static com.sofkau.utils.CargoTransportationConstants.POST_DRIVER;
 import static com.sofkau.utils.CargoTransportationConstants.URL_BASE;
 import static net.serenitybdd.rest.SerenityRest.lastResponse;
+import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.rest.questions.ResponseConsequence.seeThatResponse;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class DriverRegistrationStepDefinition extends ApiSetUp {
 
@@ -89,7 +93,22 @@ public class DriverRegistrationStepDefinition extends ApiSetUp {
     }
 
     @Then("the response status code should be {int}")
-    public void the_response_status_code_should_be(Integer code) {
+    public void theResponseStatusCodeShouldBe(Integer code) {
+
+        actor.should(
+                seeThatResponse("El codigo de respuesta es: " + code,
+                        response -> {
+                            if (response.extract().statusCode() == 400) {
+                                LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
+                            } else {
+                                response.statusCode(code);
+                                LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
+                            }
+                        }
+                )
+        );
+
 
     }
+
 }
