@@ -7,9 +7,9 @@ import org.junit.runner.RunWith;
 @RunWith(CucumberWithSerenity.class)
 @CucumberOptions(
         snippets = CucumberOptions.SnippetType.CAMELCASE,
-        features = {"src/test/resources/features/rest"},
+        features = {"src/test/resources/features"},
         glue = {"com.sofkau.stepdefinitons"},
         tags = {""}
 )
-public class Test {
+public class DriverRegistrationTest {
 }
