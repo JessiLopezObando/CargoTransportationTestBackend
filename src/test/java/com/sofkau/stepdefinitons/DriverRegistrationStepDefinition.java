@@ -8,6 +8,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Assertions;
 
@@ -45,6 +46,53 @@ public class DriverRegistrationStepDefinition extends ApiSetUp {
 
     @When("I fill in the required fields {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {double}")
     public void iFillInTheRequiredFields(String name, String lastname, String DNI, String age, String phonenumber, String email, String password, String plate, String brand, String model, String color, String type, Double totalCapacity) {
+        JSONObject request = getJsonObject(name, lastname, DNI, age, phonenumber, email, plate, brand, model, color, type, totalCapacity);
+
+        try {
+            actor.attemptsTo(
+
+                    doPost()
+                            .withTheResource(POST_DRIVER.getValue())
+                            .andTheRequestBody(request.toString())
+            );
+
+            LOGGER.info("API response to the POST request: " + lastResponse().asString());
+
+        } catch (Exception e) {
+            LOGGER.error("An error occurred while sending the POST request: " + e.getMessage());
+            e.printStackTrace();
+            Assertions.fail();
+        }
+    }
+
+
+
+    @Then("the response status code should be {int} and return a {string}")
+    public void theResponseStatusCodeShouldBeAndReturnA(Integer code, String message){
+
+       try {
+           actor.should(
+                   seeThatResponse("The satatus code is: " + code,
+                           response -> {
+                               response.statusCode(code);
+                               LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
+                           }
+                   ),
+                   seeThat("The returned message is: ", act -> lastResponse().body().asString(),
+                           containsString(message))
+           );
+       } catch (Exception e){
+           LOGGER.error("An error occurred with the assertion: " + e.getMessage());
+           LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
+           e.printStackTrace();
+           Assertions.fail();
+       }
+
+
+    }
+
+    @NotNull
+    private JSONObject getJsonObject(String name, String lastname, String DNI, String age, String phonenumber, String email, String plate, String brand, String model, String color, String type, Double totalCapacity) {
         driver.setName(name);
         driver.setLastName(lastname);
         driver.setDni(DNI);
@@ -76,46 +124,7 @@ public class DriverRegistrationStepDefinition extends ApiSetUp {
         vehicleJson.put("totalCapacity", vehicle.getTotalCapacity());
 
         request.put("vehicle", vehicleJson);
-
-        try {
-            actor.attemptsTo(
-
-                    doPost()
-                            .withTheResource(POST_DRIVER.getValue())
-                            .andTheRequestBody(request.toString())
-            );
-
-            LOGGER.info("API response to the POST request: " + lastResponse().asString());
-
-        } catch (Exception e) {
-            LOGGER.error("An error occurred while sending the POST request: " + e.getMessage());
-            e.printStackTrace();
-            Assertions.fail();
-        }
-    }
-
-    @Then("the response status code should be {int} and return a {string}")
-    public void theResponseStatusCodeShouldBeAndReturnA(Integer code, String message){
-
-       try {
-           actor.should(
-                   seeThatResponse("The satatus code is: " + code,
-                           response -> {
-                               response.statusCode(code);
-                               LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
-                           }
-                   ),
-                   seeThat("The returned message is: ", act -> lastResponse().body().asString(),
-                           containsString(message))
-           );
-       } catch (Exception e){
-           LOGGER.error("An error occurred with the assertion: " + e.getMessage());
-           LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
-           e.printStackTrace();
-           Assertions.fail();
-       }
-
-
+        return request;
     }
 
 }
