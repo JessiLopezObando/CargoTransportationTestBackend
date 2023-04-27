@@ -5,12 +5,9 @@ Feature: Driver Registration
   So that I can access as a Driver of Cargo Transportation
 
   Scenario Outline: Account Creation
-
     Given I am on the registration page
     When I fill in the required fields <name>, <lastname>, <DNI>, <age>, <phonenumber>, <email>, <plate>, <brand>, <model>, <color>, <type>, <totalCapacity>
     Then the response status code should be <code> and return a <message>
-
-
     Examples:
       | name       | lastname    | DNI          | age  | phonenumber  | email                        | plate    | brand    | model   | color   | type     | totalCapacity | code | message                              |
       | "Saira"    | "Restrepo"  | "8765342190" | "35" | "3121234567" | "sairarpo@cargo.com"         | "dgt876" | "Toyota" | "Hilux" | "black" | "PICKUP" | 1000.0        | 201  | ""                                   |
@@ -23,7 +20,7 @@ Feature: Driver Registration
       | "Rachel"   | "Smith"     | ""           | "35" | "3207890123" | "rachelsmith480@example.com" | "tyu879" | "Toyota" | "Hilux" | "blue"  | "PICKUP" | 2000.0        | 400  | "dni: Dni can't be empty"            |
       | "Rachel"   | "Smith"     | "5612098437" | "32" | "3207890123" | ""                           | "qaz951" | "Toyota" | "Hilux" | "blue"  | "PICKUP" | 2000.0        | 400  | "email: Email can't be empty"        |
       | "Diana"    | "Smith"     | "4531876902" | "32" | "3207890123" | "dia.smith@example.com"      | ""       | "Toyota" | "Hilux" | "blue"  | "PICKUP" | 2000.0        | 400  | "already exists"                     |
-      | "Andrea"   | "Lee"       | "7185049263" | "25" | "3207890123" | "andrelee2@example.com"      | "BBB169" | "Toyota" | "Hilux" | "blue"  | "PICKUP" | -2000.0       | 201  | ""                                   |
+      | "Andrea"   | "Lee"       | "7185049263" | "25" | "3207890123" | "andrelee2@example.com"      | "BBB169" | "Toyota" | "Hilux" | "blue"  | "PICKUP" | -2000.0       | 400  | ""                                   |
       | "Andres"   | "Serna"     | "3025971846" | "25" | "3207890123" | "anser200ha@mail.com"        | "bbb169" | "Toyota" | "Hilux" | "blue"  | "PICKUP" | 2000.0        | 400  | "already exists"                     |
 
 

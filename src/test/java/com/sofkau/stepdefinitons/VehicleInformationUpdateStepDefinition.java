@@ -14,8 +14,11 @@ import org.junit.jupiter.api.Assertions;
 
 import static com.sofkau.utils.CargoTransportationConstants.PUT_DRIVER;
 import static com.sofkau.utils.CargoTransportationConstants.URL_BASE;
+import static net.serenitybdd.rest.SerenityRest.lastResponse;
+import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.rest.questions.ResponseConsequence.seeThatResponse;
 import static com.sofkau.tasks.DoPut.doPut;
+import static org.hamcrest.CoreMatchers.containsString;
 
 public class VehicleInformationUpdateStepDefinition extends ApiSetUp {
 
@@ -38,15 +41,15 @@ public class VehicleInformationUpdateStepDefinition extends ApiSetUp {
         }
     }
 
-    @When("the driver fills out the vehicle information form with {string}, {string}, {string}, {string}, {string} and {int}")
-    public void theDriverFillsOutTheVehicleInformationFormWithAnd(String plate, String brand, String model, String color, String type, double totalCapacity) {
+    @When("the driver fills out the vehicle information form with {string}, {string}, {string}, {string}, {string}, {string} {string}, {string}, {string}, {string}, {string} and {double}")
+    public void theDriverFillsOutTheVehicleInformationFormWithAnd(String name, String lastname, String DNI, String age, String phonenumber, String email, String plate, String brand, String model, String color, String type, Double totalCapacity){
         try {
-            //JSONObject request = getJsonObject(name, lastname, DNI, age, phonenumber, email, plate, brand, model, color, type, totalCapacity);
+            JSONObject request = getJsonObject(name, lastname, DNI, age, phonenumber, email, plate, brand, model, color, type, totalCapacity);
 
             actor.attemptsTo(
                     doPut()
                             .withResource(PUT_DRIVER.getValue())
-                            .andTheRequestBody("")
+                            .andTheRequestBody(request.toString())
             );
         } catch (Exception e){
             LOGGER.error("An error occurred while sending the Put request: " + e.getMessage());
@@ -55,8 +58,23 @@ public class VehicleInformationUpdateStepDefinition extends ApiSetUp {
         }
     }
 
-    @Then("the vehicle information should be successfully updated and the status code response will be {int}")
-    public void theVehicleInformationShouldBeSuccessfullyUpdatedAndTheStatusCodeResponseWillBe(Integer int1) {
+    @Then("the vehicle information should be successfully updated, the status code response will be {int}")
+    public void theVehicleInformationShouldBeSuccessfullyUpdatedTheStatusCodeResponseWillBe(Integer code){
+        try {
+            actor.should(
+                    seeThatResponse("The satatus code is: " + code,
+                            response -> {
+                                response.statusCode(code);
+                                LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
+                            }
+                    )
+            );
+        } catch (Exception e){
+            LOGGER.error("An error occurred with the assertion: " + e.getMessage());
+            LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
+            e.printStackTrace();
+            Assertions.fail();
+        }
 
     }
 
