@@ -19,7 +19,6 @@ import static net.serenitybdd.rest.SerenityRest.lastResponse;
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.rest.questions.ResponseConsequence.seeThatResponse;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class DriverRegistrationStepDefinition extends ApiSetUp {
 
@@ -44,8 +43,8 @@ public class DriverRegistrationStepDefinition extends ApiSetUp {
         }
     }
 
-    @When("I fill in the required fields {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {double}")
-    public void iFillInTheRequiredFields(String name, String lastname, String DNI, String age, String phonenumber, String email, String password, String plate, String brand, String model, String color, String type, Double totalCapacity) {
+    @When("I fill in the required fields {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {double}")
+    public void iFillInTheRequiredFields(String name, String lastname, String DNI, String age, String phonenumber, String email, String plate, String brand, String model, String color, String type, Double totalCapacity) {
         JSONObject request = getJsonObject(name, lastname, DNI, age, phonenumber, email, plate, brand, model, color, type, totalCapacity);
 
         try {
