@@ -12,24 +12,19 @@ import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Assertions;
 
-import static com.sofkau.tasks.DoPost.doPost;
-import static com.sofkau.utils.CargoTransportationConstants.POST_DRIVER;
+import static com.sofkau.utils.CargoTransportationConstants.PUT_DRIVER;
 import static com.sofkau.utils.CargoTransportationConstants.URL_BASE;
-import static net.serenitybdd.rest.SerenityRest.lastResponse;
-import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.rest.questions.ResponseConsequence.seeThatResponse;
-import static org.hamcrest.CoreMatchers.containsString;
+import static com.sofkau.tasks.DoPut.doPut;
 
-public class DriverRegistrationStepDefinition extends ApiSetUp {
+public class VehicleInformationUpdateStepDefinition extends ApiSetUp {
 
-    private static final Logger LOGGER = Logger.getLogger(DriverRegistrationStepDefinition.class);
-
+    private static final Logger LOGGER = Logger.getLogger(VehicleInformationUpdateStepDefinition.class);
     Driver driver = new Driver();
     Vehicle vehicle = new Vehicle();
 
-    @Given("I am on the registration page")
-    public void iAmOnTheRegistrationPage() {
-
+    @Given("the driver is on vehicle information update page")
+    public void theDriverIsOnVehicleInformationUpdatePage() {
         try {
             setUp(URL_BASE.getValue());
             LOGGER.info("Automation has been started on the URL: " + URL_BASE.getValue());
@@ -43,50 +38,25 @@ public class DriverRegistrationStepDefinition extends ApiSetUp {
         }
     }
 
-    @When("I fill in the required fields {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {string}, {double}")
-    public void iFillInTheRequiredFields(String name, String lastname, String DNI, String age, String phonenumber, String email, String plate, String brand, String model, String color, String type, Double totalCapacity) {
-        JSONObject request = getJsonObject(name, lastname, DNI, age, phonenumber, email, plate, brand, model, color, type, totalCapacity);
-
+    @When("the driver fills out the vehicle information form with {string}, {string}, {string}, {string}, {string} and {int}")
+    public void theDriverFillsOutTheVehicleInformationFormWithAnd(String plate, String brand, String model, String color, String type, double totalCapacity) {
         try {
+            //JSONObject request = getJsonObject(name, lastname, DNI, age, phonenumber, email, plate, brand, model, color, type, totalCapacity);
+
             actor.attemptsTo(
-
-                    doPost()
-                            .withTheResource(POST_DRIVER.getValue())
-                            .andTheRequestBody(request.toString())
+                    doPut()
+                            .withResource(PUT_DRIVER.getValue())
+                            .andTheRequestBody("")
             );
-
-            LOGGER.info("API response to the POST request: " + lastResponse().asString());
-
-        } catch (Exception e) {
-            LOGGER.error("An error occurred while sending the POST request: " + e.getMessage());
+        } catch (Exception e){
+            LOGGER.error("An error occurred while sending the Put request: " + e.getMessage());
             e.printStackTrace();
             Assertions.fail();
         }
     }
 
-
-
-    @Then("the response status code should be {int} and return a {string}")
-    public void theResponseStatusCodeShouldBeAndReturnA(Integer code, String message){
-
-       try {
-           actor.should(
-                   seeThatResponse("The satatus code is: " + code,
-                           response -> {
-                               response.statusCode(code);
-                               LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
-                           }
-                   ),
-                   seeThat("The returned message is: ", act -> lastResponse().body().asString(),
-                           containsString(message))
-           );
-       } catch (Exception e){
-           LOGGER.error("An error occurred with the assertion: " + e.getMessage());
-           LOGGER.info("API response to the POST request: " + lastResponse().statusCode());
-           e.printStackTrace();
-           Assertions.fail();
-       }
-
+    @Then("the vehicle information should be successfully updated and the status code response will be {int}")
+    public void theVehicleInformationShouldBeSuccessfullyUpdatedAndTheStatusCodeResponseWillBe(Integer int1) {
 
     }
 
